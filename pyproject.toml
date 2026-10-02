@@ -1,0 +1,47 @@
+[project]
+name = "fin-c2-056"
+version = "0.1.0"
+description = "ML model lifecycle documentation and audit report generator — AgentCore template"
+requires-python = ">=3.11"
+# The framework (agenticstar-agentcore) is installed from the package registry
+# by the build pipeline, not from the public index. Pinning it here would make
+# `pip install -e .` fail, because it is not resolvable from the default index.
+dependencies = [
+    "agenticstar-agentcore[marketplace,openai]==1.0.3",]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-cov==5.0.0",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.4.4",
+    "mypy==1.10.0",
+]
+
+[build-system]
+requires = ["setuptools==68.2.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+# The framework wheel ships no type information, so every symbol imported from
+# it resolves to Any. Under strict mode that is an error at each subclass and
+# each call site, none of which says anything about this template's own types.
+disallow_subclassing_any = false
+exclude = "src/examples/"
+
+[[tool.mypy.overrides]]
+module = ["framework.*", "shared.*", "langgraph.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The state schema extends an untyped base class, so every field declaration in
+# it is reported as an invalid type. All of those reports have the same single
+# cause — the untyped base — and none is actionable in this file.
+module = ["src.schemas.state"]
+disable_error_code = ["valid-type"]

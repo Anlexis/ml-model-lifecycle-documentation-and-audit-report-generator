@@ -1,0 +1,29 @@
+# Runtime parameters — loaded by the agent registry and passed as Graph(config=...).
+# Separate from config/agent.yaml, which is the static manifest.
+
+# Retry budget for the backbone's routing decision.
+max_retry: 3
+# Request timeout in seconds, honoured by framework service clients.
+timeout_s: 30
+
+# Document bounds. Every value here has a reader:
+#
+#   max_text_chars, max_change_history_entries, max_performance_metrics
+#       read at the request boundary (src/services/model_contract.py, seeded
+#       into outer state by MLModelLifecycleDocAuditAgent._extra_initial_state).
+#       They decide what a caller may send: a record beyond any of them is
+#       refused, naming the field.
+#   line_width
+#       read by the renderer (src/nodes/output_format_node.py, forwarded to the
+#       inner workflow by ModelAuditGraphNode._parent_config). It fixes the
+#       width of the rules that separate the document's parts — a model risk
+#       submission is read as fixed-width plain text and some review workflows
+#       pin that width.
+#
+# Changing a value here changes behaviour end to end; nothing in this block is
+# declared and then ignored.
+report:
+  max_text_chars: 2000
+  max_change_history_entries: 25
+  max_performance_metrics: 20
+  line_width: 72
